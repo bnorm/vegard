@@ -16,17 +16,17 @@ kotlin {
     named("commonMain") {
       dependencies {
         implementation(kotlin("stdlib"))
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0-1.4.0-dev-5730")
       }
     }
     named("jvmMain") {
       dependencies {
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0-1.4.0-dev-5730")
       }
     }
     named("jsMain") {
       dependencies {
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0-1.4.0-dev-5730")
       }
     }
   }
