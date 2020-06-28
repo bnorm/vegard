@@ -1,0 +1,21 @@
+POST http://localhost:8081/api/v1/login
+Content-Type: application/json
+
+{
+  "email": "brian@bnorm.com",
+  "password": "vegard"
+}
+
+> {% client.global.set("jwt", response.body.trim()) %}
+
+###
+
+GET http://localhost:8081/api/v1/users
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+###
+
+GET http://localhost:8081/api/v1/users/me
+Content-Type: application/json
+Authorization: Bearer {{jwt}}

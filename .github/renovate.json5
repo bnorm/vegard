@@ -1,0 +1,87 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "prConcurrentLimit": 1,
+  "packageRules": [
+    {
+      "managers": [
+        "maven"
+      ],
+      "registryUrls": [
+        "https://repo.maven.apache.org/maven2",
+        "https://jcenter.bintray.com",
+        "https://kotlin.bintray.com/kotlinx",
+        "https://dl.bintray.com/kotlin/kotlin-js-wrappers"
+      ]
+    },
+    {
+      "groupName": "kotlin",
+      "packagePatterns": [
+        "^org\.jetbrains\.kotlin:",
+        "^org\.jetbrains\.kotlin\."
+      ],
+      "separateMinorPatch": true
+    },
+    {
+      "groupName": "kotlinx-coroutines",
+      "packagePatterns": [
+        "^org\.jetbrains\.kotlinx:kotlinx-coroutines"
+      ]
+    },
+    {
+      "groupName": "kotlinx-coroutines",
+      "packagePatterns": [
+        "^org\.jetbrains\.kotlinx:kotlinx-coroutines"
+      ]
+    },
+    {
+      "groupName": "kotlinx-serialization",
+      "packagePatterns": [
+        "^org\.jetbrains\.kotlinx:kotlinx-serialization"
+      ]
+    },
+    {
+      "groupName": "org.junit.jupiter",
+      "packagePatterns": [
+        "^org\.junit\.jupiter"
+      ]
+    },
+    {
+      "groupName": "org.apache.logging.log4j",
+      "packagePatterns": [
+        "^org\.apache\.logging\.log4j"
+      ]
+    },
+    {
+      "groupName": "io.ktor",
+      "packagePatterns": [
+        "^io\.ktor"
+      ]
+    },
+    {
+      "groupName": "org.jetbrains.exposed",
+      "packagePatterns": [
+        "^org\.jetbrains\.exposed"
+      ]
+    },
+    {
+      "groupName": "org.testcontainers",
+      "packagePatterns": [
+        "^org\.testcontainers"
+      ]
+    },
+    {
+      "groupName": "kotlin-wrappers",
+      "packagePatterns": [
+        "^org\.jetbrains:kotlin-css",
+        "^org\.jetbrains:kotlin-css-js",
+        "^org\.jetbrains:kotlin-extensions",
+        "^org\.jetbrains:kotlin-react",
+        "^org\.jetbrains:kotlin-react-dom",
+        "^org\.jetbrains:kotlin-react-router-dom",
+        "^org\.jetbrains:kotlin-styled"
+      ]
+    }
+  ]
+}
