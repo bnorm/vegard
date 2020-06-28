@@ -45,7 +45,7 @@ dependencies {
   implementation("org.jetbrains:kotlin-css-js:1.0.0-pre.109-kotlin-1.3.72")
   implementation("org.jetbrains:kotlin-styled:1.0.0-pre.109-kotlin-1.3.72")
 
-  implementation("io.github.microutils:kotlin-logging-js:1.7.10")
+  implementation("io.github.microutils:kotlin-logging-js:1.8.0.1")
 
   implementation(npm("core-js", "3.2.0"))
   implementation(npm("react", "16.13.1"))
