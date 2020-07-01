@@ -9,25 +9,79 @@
 
 #define DELAY 5000
 #define MOISTURE1_PIN PIN_A1
-#define MOISTURE1_MIN 460
-#define MOISTURE1_MAX 890
+#define DHT22_PIN 5
 
 char ssid[] = SECRET_SSID; // your network SSID (name)
 char pass[] = SECRET_PASS; // your network password (use for WPA, or use as key for WEP)
 
 char host[] = SERVER_HOST;
-int port = 8080;
+char macAddress[18];
+int port = 8081;
 
 WiFiClient wifi;
 HttpClient client = HttpClient(wifi, host, port);
-int status = WL_IDLE_STATUS;
+String token;
 
 dht tempSensor;
 
-#define DHT22_PIN 5
+int connect(String &token) {
+    char *data = (char *) malloc(1024 * sizeof(char));
+    sprintf(data, R"({"macAddress":"%s","serialNumber":"N/A"})", macAddress);
+    Serial.print("Request: ");
+    Serial.println(data);
+
+    client.post("/api/v1/connect", "application/json", data);
+
+    int statusCode = client.responseStatusCode();
+    Serial.print("Status code: ");
+    Serial.println(statusCode);
+
+    token = client.responseBody();
+    Serial.print("Response: ");
+    Serial.println(token);
+
+    free(data);
+    return statusCode;
+}
+
+int record(HttpClient &httpClient, const String &token, int moisture1Raw, float temperature, float humidity) {
+    // TODO: convert to String?
+    char *data = (char *) malloc(1024 * sizeof(char));
+
+    sprintf(
+            data,
+            R"({"ambientTemperature":%f,"ambientHumidity":%f,"soilMoisture":%d})",
+            temperature,
+            humidity,
+            moisture1Raw
+    );
+    Serial.print("Request: ");
+    Serial.println(data);
+
+    httpClient.beginRequest();
+    httpClient.post("/api/v1/controllers/record");
+    httpClient.sendHeader(HTTP_HEADER_CONTENT_TYPE, "application/json");
+    httpClient.sendHeader(HTTP_HEADER_CONTENT_LENGTH, strlen(data));
+    httpClient.sendHeader("Authorization", "Bearer " + token);
+    httpClient.endRequest();
+    httpClient.print(data);
+
+    int statusCode = httpClient.responseStatusCode();
+    Serial.print("Status code: ");
+    Serial.println(statusCode);
+
+    String response = httpClient.responseBody();
+    Serial.print("Response: ");
+    Serial.println(response);
+
+    free(data);
+    return statusCode;
+}
 
 void setup() {
     Serial.begin(9600);
+
+    int status = WL_IDLE_STATUS;
     while (status != WL_CONNECTED) {
         Serial.print("Attempting to connect to Network named: ");
         Serial.println(ssid);  // print the network name (SSID);
@@ -44,6 +98,8 @@ void setup() {
     IPAddress ip = WiFi.localIP();
     Serial.print("IP Address: ");
     Serial.println(ip);
+
+    getMacAddress(macAddress);
 }
 
 void loop() {
@@ -55,23 +111,14 @@ void loop() {
     int moisture1Raw = analogRead(MOISTURE1_PIN);
 
     Serial.println("making POST request");
+    int statusCode;
 
-    String postData = String("{")
-                      + String("\"humidity\":") + String(tempSensor.humidity) + String(",")
-                      + String("\"temperature\":") + String(tempSensor.temperature) + String(",")
-                      + String("\"moisture\":") + String(moisture1Raw)
-                      + String("}");
-    client.post("/api/v1/dht", "application/json", postData);
+    statusCode = record(client, token, moisture1Raw, tempSensor.temperature, tempSensor.humidity);
+    while (statusCode == 401) {
+        connect(token);
+        statusCode = record(client, token, moisture1Raw, tempSensor.temperature, tempSensor.humidity);
+    }
 
-    // read the status code and body of the response
-    int statusCode = client.responseStatusCode();
-    String response = client.responseBody();
-    client.clearWriteError()
-
-    Serial.print("Status code: ");
-    Serial.println(statusCode);
-    Serial.print("Response: ");
-    Serial.println(response);
 
     delay(DELAY);
 }

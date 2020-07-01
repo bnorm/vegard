@@ -26,7 +26,7 @@ class JwtServiceTest {
   fun `created token can be verified`() {
     val token = service.createToken(UserId(1))
     assertDoesNotThrow {
-      service.verifier.verify(token)
+      service.userVerifier.verify(token)
     }
   }
 
@@ -36,7 +36,7 @@ class JwtServiceTest {
   )
   fun `known good tokens can be verified`(token: String) {
     assertDoesNotThrow {
-      service.verifier.verify(token)
+      service.userVerifier.verify(token)
     }
   }
 
@@ -51,7 +51,7 @@ class JwtServiceTest {
   )
   fun `known bad tokens fail verification`(token: String, message: String) {
     val exception = assertThrows<JWTVerificationException> {
-      service.verifier.verify(token)
+      service.userVerifier.verify(token)
     }
     assertEquals(message, exception.message)
   }

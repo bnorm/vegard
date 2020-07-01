@@ -1,0 +1,23 @@
+POST http://localhost:8081/api/v1/connect
+Content-Type: application/json
+
+{
+  "macAddress": "24:62:ab:b7:c2:50",
+  "serialNumber": "N/A"
+}
+
+> {% client.global.set("jwt", response.body.trim()) %}
+
+###
+
+GET http://localhost:8081/api/v1/controllers/me
+Content-Type: application/json
+Authorization: Bearer {{jwt}}
+
+###
+
+POST http://localhost:8081/api/v1/controllers/record
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwicm9sZSI6ImNvbnRyb2xsZXIiLCJpc3MiOiJ2ZWdhcmQuYm5vcm0uY29tIiwiZXhwIjoxNTkzNTU5NTUwfQ.jRC5D0_hXcDP9tf9Q3f1IFkXNzy5rK0-lLVDmdWWsEFL6iO0-9dgQbz9HJf9noOkHGU2yJ-JQcDndxs8LztKMg
+
+{"ambientTemperature":24.100000,"ambientHumidity":42.500000,"soilMoisture":873}

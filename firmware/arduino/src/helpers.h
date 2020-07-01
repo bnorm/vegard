@@ -29,11 +29,16 @@ void blinkLed(int port, int duration) {
     delay(duration);
 }
 
+void getMacAddress(char macAddress[18]) {
+    byte mac[6];
+    WiFi.macAddress(mac);
+    sprintf(macAddress, "%2x:%2x:%2x:%2x:%2x:%2x", mac[5], mac[4], mac[3], mac[2], mac[1], mac[0]);
+}
+
 void printWifiData() {
     // print your WiFi shield's IP address:
     IPAddress ip = WiFi.localIP();
     Serial.print("IP Address: ");
-    Serial.println(ip);
     Serial.println(ip);
 
     // print your MAC address:

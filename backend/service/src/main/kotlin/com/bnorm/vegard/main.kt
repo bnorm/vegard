@@ -36,7 +36,7 @@ fun Application.main() {
     }
   }
 
-  app(injector.getInstance(), injector.getInstance())
+  app(injector.getInstance(), injector.getInstance(), injector.getInstance())
 }
 
 inline fun <reified T> Injector.getInstance(): T {

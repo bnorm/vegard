@@ -2,12 +2,18 @@ package com.bnorm.vegard
 
 import com.auth0.jwt.interfaces.Payload
 import com.bnorm.vegard.api.ById
+import com.bnorm.vegard.auth.ControllerPrincipal
 import com.bnorm.vegard.auth.JwtService
 import com.bnorm.vegard.auth.LoginFailureException
 import com.bnorm.vegard.auth.UserPrincipal
+import com.bnorm.vegard.model.ControllerConnectRequest
+import com.bnorm.vegard.model.ControllerId
+import com.bnorm.vegard.model.ControllerPrototype
+import com.bnorm.vegard.model.ControllerReading
 import com.bnorm.vegard.model.UserId
 import com.bnorm.vegard.model.UserLoginRequest
 import com.bnorm.vegard.model.UserPrototype
+import com.bnorm.vegard.service.ControllerService
 import com.bnorm.vegard.service.UserService
 import io.ktor.application.Application
 import io.ktor.application.call
@@ -43,7 +49,11 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.UUID
 
-fun Application.app(jwtService: JwtService, userService: UserService) {
+fun Application.app(
+  jwtService: JwtService,
+  userService: UserService,
+  controllerService: ControllerService
+) {
   install(DefaultHeaders)
   install(Locations)
 
@@ -74,8 +84,8 @@ fun Application.app(jwtService: JwtService, userService: UserService) {
   }
 
   install(Authentication) {
-    jwt {
-      verifier(jwtService.verifier)
+    jwt("user_jwt") {
+      verifier(jwtService.userVerifier)
       validate { credential ->
         val userId = credential.payload.userId
           ?: return@validate null
@@ -84,6 +94,18 @@ fun Application.app(jwtService: JwtService, userService: UserService) {
           ?: return@validate null
 
         UserPrincipal(user, credential.payload)
+      }
+    }
+    jwt("controller_jwt") {
+      verifier(jwtService.controllerVerifier)
+      validate { credential ->
+        val controllerId = credential.payload.controllerId
+          ?: return@validate null
+
+        val controller = controllerService.findById(controllerId)
+          ?: return@validate null
+
+        ControllerPrincipal(controller, credential.payload)
       }
     }
   }
@@ -108,12 +130,20 @@ fun Application.app(jwtService: JwtService, userService: UserService) {
       post("login") {
         val credentials = call.receive<UserLoginRequest>()
         val user = userService.findUserByCredentials(credentials)
-          ?: throw LoginFailureException("unknown username and password combination")
+          ?: throw LoginFailureException("unknown user credentials")
         val token = jwtService.createToken(user.id)
         call.respondText(token)
       }
 
-      authenticate {
+      post("connect") {
+        val credentials = call.receive<ControllerConnectRequest>()
+        val controller = controllerService.findByCredentials(credentials)
+          ?: throw LoginFailureException("unknown controller credentials")
+        val token = jwtService.createToken(controller.id)
+        call.respondText(token)
+      }
+
+      authenticate("user_jwt") {
         route("users") {
           post {
             val prototype = call.receive<UserPrototype>()
@@ -131,8 +161,46 @@ fun Application.app(jwtService: JwtService, userService: UserService) {
           }
         }
       }
+
+      route("controllers") {
+        // Only controllers can record readings
+        authenticate("controller_jwt") {
+          get("me") {
+            call.respond(call.principal<ControllerPrincipal>()!!.controller)
+          }
+          post("record") {
+            val controller = call.principal<ControllerPrincipal>()!!.controller
+            val reading = call.receive<ControllerReading>()
+            call.respond(controllerService.recordReading(controller.id, reading))
+          }
+        }
+
+        // Users can view and create controllers
+        authenticate("user_jwt") {
+          post {
+            val prototype = call.receive<ControllerPrototype>()
+            call.respond(controllerService.create(prototype))
+          }
+          get {
+            call.respond(controllerService.getAll().toList())
+          }
+          get<ById> { (id) ->
+            val controller = controllerService.findById(ControllerId(id))
+              ?: throw NotFoundException("unknown controller with id = $id")
+            call.respond(controller)
+          }
+        }
+      }
     }
   }
 }
 
-private val Payload.userId get() = subject.toLongOrNull()?.let { UserId(it) }
+private val Payload.userId
+  get() = subject.takeIf { getClaim("role").asString() == "user" }
+    ?.toLongOrNull()
+    ?.let { UserId(it) }
+
+private val Payload.controllerId
+  get() = subject.takeIf { getClaim("role").asString() == "controller" }
+    ?.toLongOrNull()
+    ?.let { ControllerId(it) }

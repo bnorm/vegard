@@ -9,7 +9,7 @@
         <Logger name="com.bnorm.vegard" level="trace"/>
         <Logger name="org.flywaydb" level="info"/>
 
-        <Root level="warn">
+        <Root level="trace">
             <AppenderRef ref="stdout"/>
         </Root>
     </Loggers>
