@@ -32,7 +32,7 @@ dependencies {
   implementation(project(":common:client"))
 
   implementation(kotlin("stdlib-js"))
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.7")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.3.8")
 
   implementation("io.ktor:ktor-client-auth-js:1.3.2")
 
