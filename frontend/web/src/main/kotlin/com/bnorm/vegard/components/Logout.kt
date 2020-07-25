@@ -1,33 +1,28 @@
 package com.bnorm.vegard.components
 
-import com.bnorm.vegard.UserAction
-import com.bnorm.vegard.UserContext
-import com.bnorm.vegard.client.vegardClient
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.bnorm.vegard.auth.useUserSession
 import kotlinx.html.js.onClickFunction
+import materialui.components.button.button
+import materialui.components.button.enums.ButtonColor
+import materialui.components.button.enums.ButtonVariant
 import react.RBuilder
 import react.RProps
-import react.dom.button
 import react.rFunction
 
 @Suppress("FunctionName")
-fun RBuilder.Logout() {
-  LOGOUT {}
-}
+fun RBuilder.LogoutButton() = LOGOUT_BUTTON {}
 
 interface LogoutProps : RProps
 
-val LOGOUT = rFunction<LogoutProps>("Logout") { _ ->
-  UserContext.Consumer { (_, dispatch) ->
-    button(classes = "btn btn-danger my-2 my-sm-0") {
-      +"Logout"
-      attrs.onClickFunction = {
-        GlobalScope.launch {
-          vegardClient.logout()
-          dispatch(UserAction.Logout)
-        }
-      }
+val LOGOUT_BUTTON = rFunction<LogoutProps>("Logout") {
+  val session = useUserSession()
+  button {
+    attrs {
+      variant = ButtonVariant.contained
+      color = ButtonColor.secondary
+      onClickFunction = { session.logout() }
     }
+
+    +"Logout"
   }
 }

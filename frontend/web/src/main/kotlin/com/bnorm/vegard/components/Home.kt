@@ -1,85 +1,112 @@
 package com.bnorm.vegard.components
 
-import com.bnorm.vegard.UserContext
-import com.bnorm.vegard.session
-import kotlinx.html.ButtonType
-import kotlinx.html.InputType
-import kotlinx.html.js.onSubmitFunction
+import com.bnorm.vegard.auth.useUserSession
+import com.bnorm.vegard.client.vegardClient
+import com.bnorm.vegard.model.Controller
+import com.bnorm.vegard.model.ControllerReading
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import react.RBuilder
 import react.RProps
-import react.child
-import react.dom.button
 import react.dom.div
-import react.dom.form
 import react.dom.h1
-import react.dom.input
-import react.dom.li
-import react.dom.nav
-import react.dom.span
-import react.dom.ul
-import react.functionalComponent
-import react.router.dom.browserRouter
-import react.router.dom.redirect
-import react.router.dom.route
-import react.router.dom.routeLink
+import react.getValue
+import react.rFunction
+import react.setValue
+import react.useEffect
+import react.useState
+import thirdparty.dxchart.components.ArgumentAxis
+import thirdparty.dxchart.components.Chart
+import thirdparty.dxchart.components.EventTracker
+import thirdparty.dxchart.components.LineSeries
+import thirdparty.dxchart.components.Tooltip
+import thirdparty.dxchart.components.ValueAxis
+import kotlin.js.Date
 
-@Suppress("FunctionName")
-fun RBuilder.Home() {
-  child(HOME) {
-
-  }
-}
+fun RBuilder.Home() = HOME {}
 
 private interface HomeProps : RProps
 
-private val HOME = functionalComponent<HomeProps> {
-  UserContext.Consumer { (state, _) ->
-    val session = state.session ?: return@Consumer
+private val HOME = rFunction<HomeProps>("Home") {
+  val session = useUserSession()
+  var controllerReadings by useState<Map<Controller, List<ControllerReading>>?>(null)
+  useEffect(emptyList()) {
+    GlobalScope.launch {
+      val now = Date()
+      val startTime = Date(now.getTime() - (15L * 24 * 60 * 60 * 1000))
+      controllerReadings = vegardClient.getControllers()
+        .map { async { it to vegardClient.getControllerRecords(it.id, startTime.toISOString()) } }
+        .map { it.await() }
+        .filter { it.second.isNotEmpty() }
+        .toMap()
+    }
+  }
 
-    browserRouter {
+  div {
+    h1 {
+      +"Hello, ${session.user?.firstName}"
+    }
 
-      route(path = "/home") {
-        div {
-          nav(classes = "navbar navbar-expand-lg navbar-dark bg-dark") {
-            routeLink(className = "navbar-brand", to = "/") { +"Navbar" }
-            button(classes = "navbar-toggler", type = ButtonType.button) {
-              attrs["data-toggle"] = "collapse"
-              attrs["data-target"] = "#navbarSupportContent"
-              attrs["aria-controls"] = "navbarSupportContent"
-              attrs["aria-expand"] = "false"
-              attrs["aria-label"] = "Toggle navigation"
+    controllerReadingCharts(controllerReadings)
+  }
+}
 
-              span(classes = "navbar-toggler-icon") {}
-            }
+private fun RBuilder.controllerReadingCharts(controllerReadings: Map<Controller, List<ControllerReading>>?) {
+  if (controllerReadings == null) {
+    div {
+      +"Loading controller data..."
+    }
+  } else if (controllerReadings.isEmpty()) {
+    div {
+      +"No controller data"
+    }
+  } else {
+    for ((_, readings) in controllerReadings) {
+      data class Reading(
+        val timestamp: Long,
+        val soilMoisture: Double,
+        val ambientTemperature: Double,
+        val ambientHumidity: Double
+      )
 
-            div(classes = "collapse navbar-collapse") {
-              ul(classes = "navbar-nav mr-auto") {
-                li(classes = "nav-item active") {
-                  routeLink(className = "nav-link", to = "/home") { +"Home" }
-                }
-              }
-
-              form(classes = "form-inline my-2 my-lg-0") {
-                attrs.onSubmitFunction = { it.preventDefault() } // TODO: Make search do nothing for right now
-                input(classes = "form-control mr-sm-2", type = InputType.search) {
-                  attrs.placeholder = "Search"
-                  attrs["aria-label"] = "Search"
-                }
-                button(classes = "btn btn-outline-success my-2 my-sm-0 mr-sm-2", type = ButtonType.submit) {
-                  +"Search"
-                }
-              }
-
-              Logout()
-            }
+      Chart(
+        data = readings
+          .map {
+            Reading(
+              it.timestamp.getTime().toLong(),
+              (1.0 - toRatio(it.soilMoisture, 480.0, 870.0)) * 100,
+              it.ambientTemperature.toFahrenheit(),
+              it.ambientHumidity
+            )
           }
+          .toTypedArray()
+      ) {
+        ArgumentAxis {}
+        ValueAxis {}
 
-          h1 {
-            +"Hello, ${session.user.firstName}"
-          }
-        }
+        EventTracker {}
+        Tooltip {}
+
+        LineSeries(
+          name = "Soil Moisture",
+          valueField = Reading::soilMoisture,
+          argumentField = Reading::timestamp
+        )
+        LineSeries(
+          name = "Ambient Temperature",
+          valueField = Reading::ambientTemperature,
+          argumentField = Reading::timestamp
+        )
+        LineSeries(
+          name = "Ambient Humidity",
+          valueField = Reading::ambientHumidity,
+          argumentField = Reading::timestamp
+        )
       }
-      redirect(from = "/", to = "/home", exact = true)
     }
   }
 }
+
+private fun toRatio(value: Double, min: Double, max: Double): Double = (minOf(maxOf(value, min), max) - min) / (max - min)
+private fun Double.toFahrenheit() = ((this * 9.0) / 5.0) + 32.0

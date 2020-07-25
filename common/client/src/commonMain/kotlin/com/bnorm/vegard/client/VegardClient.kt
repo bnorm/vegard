@@ -1,5 +1,9 @@
 package com.bnorm.vegard.client
 
+import com.bnorm.vegard.model.Controller
+import com.bnorm.vegard.model.ControllerId
+import com.bnorm.vegard.model.ControllerReading
+import com.bnorm.vegard.model.Timestamp
 import com.bnorm.vegard.model.User
 import com.bnorm.vegard.model.UserLoginRequest
 import io.ktor.client.HttpClient
@@ -11,6 +15,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.http.HttpHeaders
+import io.ktor.http.Parameters
 import io.ktor.http.Url
 
 interface AuthJwtStorage {
@@ -39,7 +44,8 @@ fun VegardClient(
   block: HttpClientConfig<*>.() -> Unit = {}
 ): VegardClient = VegardClient(url, storage, HttpClient {
   defaultRequest {
-    storage.retrieve()?.let { jwt -> headers[HttpHeaders.Authorization] = "Bearer $jwt" }
+    val jwt = storage.retrieve()
+    if (jwt != null) headers[HttpHeaders.Authorization] = "Bearer $jwt"
   }
   install(JsonFeature) {
     serializer = KotlinxSerializer()
@@ -60,12 +66,25 @@ class VegardClient(
     storage.store(jwt)
   }
 
-  suspend fun logout() {
+  fun logout() {
     storage.clear()
   }
 
   suspend fun getMe(): User {
     return client.get(url.appendPath("users", "me"))
+  }
+
+  suspend fun getControllers(): List<Controller> {
+    return client.get(url.appendPath("controllers"))
+  }
+
+  suspend fun getControllerRecords(id: ControllerId, startTime: String, endTime: String? = null): List<ControllerReading> {
+    return client.get(url.appendPath("controllers", id.toString(), "records")
+      .copy(parameters = Parameters.build {
+        append("startTime", startTime)
+        if (endTime != null) append("endTime", endTime)
+      })
+    )
   }
 }
 

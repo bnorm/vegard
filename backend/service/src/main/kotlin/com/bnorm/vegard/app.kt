@@ -2,14 +2,16 @@ package com.bnorm.vegard
 
 import com.auth0.jwt.interfaces.Payload
 import com.bnorm.vegard.api.ById
+import com.bnorm.vegard.api.RecordsById
 import com.bnorm.vegard.auth.ControllerPrincipal
 import com.bnorm.vegard.auth.JwtService
 import com.bnorm.vegard.auth.LoginFailureException
 import com.bnorm.vegard.auth.UserPrincipal
+import com.bnorm.vegard.model.ControllerActionWrapper
 import com.bnorm.vegard.model.ControllerConnectRequest
 import com.bnorm.vegard.model.ControllerId
 import com.bnorm.vegard.model.ControllerPrototype
-import com.bnorm.vegard.model.ControllerReading
+import com.bnorm.vegard.model.ControllerReadingPrototype
 import com.bnorm.vegard.model.UserId
 import com.bnorm.vegard.model.UserLoginRequest
 import com.bnorm.vegard.model.UserPrototype
@@ -25,6 +27,7 @@ import io.ktor.auth.principal
 import io.ktor.features.CORS
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
+import io.ktor.features.DataConversion
 import io.ktor.features.DefaultHeaders
 import io.ktor.features.NotFoundException
 import io.ktor.features.StatusPages
@@ -43,10 +46,14 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.serialization.json
+import io.ktor.util.DataConversionException
 import kotlinx.coroutines.flow.toList
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.JsonConfiguration
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 fun Application.app(
@@ -62,8 +69,29 @@ fun Application.app(
     logger = LoggerFactory.getLogger("com.bnorm.vegard.api.request")
   }
 
+  install(DataConversion) {
+    convert<Instant> {
+      decode { values, _ ->
+        values.singleOrNull()?.let { DateTimeFormatter.ISO_INSTANT.parse(it, Instant::from) }
+      }
+
+      encode { value ->
+        when (value) {
+          null -> listOf()
+          is Instant -> listOf(DateTimeFormatter.ISO_INSTANT.format(value))
+          else -> throw DataConversionException("Cannot convert $value as Instant")
+        }
+      }
+    }
+  }
   install(ContentNegotiation) {
-    json()
+    json(
+      json = JsonConfiguration.Stable.copy(
+        isLenient = true,
+        serializeSpecialFloatingPointValues = true,
+        allowStructuredMapKeys = true
+      )
+    )
   }
 
   install(StatusPages) {
@@ -156,7 +184,8 @@ fun Application.app(
             call.respond(call.principal<UserPrincipal>()!!.user)
           }
           get<ById> { (id) ->
-            val user = userService.findUserById(UserId(id)) ?: throw NotFoundException("unknown user with id = $id")
+            val user = userService.findUserById(UserId(id))
+              ?: throw NotFoundException("unknown user with id = $id")
             call.respond(user)
           }
         }
@@ -168,9 +197,13 @@ fun Application.app(
           get("me") {
             call.respond(call.principal<ControllerPrincipal>()!!.controller)
           }
+          get("action") {
+            val controller = call.principal<ControllerPrincipal>()!!.controller
+            call.respond(ControllerActionWrapper(controllerService.determineAction(controller)))
+          }
           post("record") {
             val controller = call.principal<ControllerPrincipal>()!!.controller
-            val reading = call.receive<ControllerReading>()
+            val reading = call.receive<ControllerReadingPrototype>()
             call.respond(controllerService.recordReading(controller.id, reading))
           }
         }
@@ -188,6 +221,10 @@ fun Application.app(
             val controller = controllerService.findById(ControllerId(id))
               ?: throw NotFoundException("unknown controller with id = $id")
             call.respond(controller)
+          }
+          get<RecordsById> { (id, startTime, endTime) ->
+            val readings = controllerService.getRecordings(ControllerId(id), startTime, endTime)
+            call.respond(readings.toList())
           }
         }
       }

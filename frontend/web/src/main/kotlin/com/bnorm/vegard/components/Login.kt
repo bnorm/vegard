@@ -1,93 +1,194 @@
 package com.bnorm.vegard.components
 
-import com.bnorm.vegard.UserAction
-import com.bnorm.vegard.UserContext
+import com.bnorm.vegard.auth.useUserSession
 import com.bnorm.vegard.client.vegardClient
 import com.bnorm.vegard.model.Password
 import com.bnorm.vegard.model.UserLoginRequest
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.css.Align
+import kotlinx.css.Display
+import kotlinx.css.FlexDirection
+import kotlinx.css.alignItems
+import kotlinx.css.backgroundColor
+import kotlinx.css.display
+import kotlinx.css.flexDirection
+import kotlinx.css.margin
+import kotlinx.css.marginTop
+import kotlinx.css.pct
+import kotlinx.css.width
 import kotlinx.html.ButtonType
 import kotlinx.html.InputType
 import kotlinx.html.js.onChangeFunction
 import kotlinx.html.js.onSubmitFunction
+import materialui.components.button.button
+import materialui.components.button.enums.ButtonColor
+import materialui.components.button.enums.ButtonVariant
+import materialui.components.checkbox.checkbox
+import materialui.components.checkbox.enums.CheckboxColor
+import materialui.components.container.container
+import materialui.components.container.enums.ContainerMaxWidth
+import materialui.components.cssbaseline.cssBaseline
+import materialui.components.formcontrol.enums.FormControlMargin
+import materialui.components.formcontrol.enums.FormControlVariant
+import materialui.components.formcontrollabel.formControlLabel
+import materialui.components.grid.grid
+import materialui.components.link.link
+import materialui.components.textfield.textField
+import materialui.components.typography.enums.TypographyVariant
+import materialui.components.typography.typography
+import materialui.styles.makeStyles
+import materialui.styles.muitheme.spacing
+import materialui.styles.palette.main
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import react.RBuilder
 import react.RProps
-import react.dom.button
 import react.dom.div
 import react.dom.form
-import react.dom.input
-import react.dom.label
 import react.getValue
 import react.rFunction
 import react.setValue
-import react.useEffect
 import react.useState
-import kotlin.browser.window
 
 @Suppress("FunctionName")
-fun RBuilder.Login() {
-  LOGIN {}
-}
+fun RBuilder.Login() = LOGIN {}
 
 private interface LoginProps : RProps
 
+private val useStyles = makeStyles<dynamic> {
+  "paper" {
+    marginTop = theme.spacing(8)
+    display = Display.flex
+    flexDirection = FlexDirection.column
+    alignItems = Align.center
+  }
+  "avatar" {
+    margin = theme.spacing(1, 1, 1, 1)
+    backgroundColor = theme.palette.secondary.main
+  }
+  "form" {
+    width = 100.pct // Fix IE 11 issue.
+    marginTop = theme.spacing(1)
+  }
+  "submit" {
+    margin = theme.spacing(3, 0, 2)
+  }
+}
+
 private val LOGIN = rFunction<LoginProps>("Login") {
+  val classes = useStyles()
   var email by useState("")
   var password by useState("")
+  val session = useUserSession()
 
-  // automatically redirect to root
-  useEffect {
-    if (window.location.pathname != "/") {
-      window.location.href = "/"
-    }
-  }
-  if (window.location.pathname != "/") {
-    div {}
-    return@rFunction
-  }
+  fun validateForm() = email.isNotEmpty() && password.isNotEmpty()
+  fun handleSubmit(event: Event) {
+    event.preventDefault()
 
-  UserContext.Consumer { (_, dispatch) ->
-    fun validateForm() = email.isNotEmpty() && password.isNotEmpty()
-    fun handleSubmit(event: Event) {
-      event.preventDefault()
-
-      GlobalScope.launch {
-        dispatch(UserAction.Authenticating)
-        runCatching {
-          vegardClient.login(UserLoginRequest(email, Password(password)))
-          val user = vegardClient.getMe()
-          dispatch(UserAction.Login(user))
-        }.onFailure {
-          dispatch(UserAction.Logout)
-        }
+    GlobalScope.launch {
+      session.authenticating()
+      runCatching {
+        vegardClient.login(UserLoginRequest(email, Password(password)))
+        val user = vegardClient.getMe()
+        session.login(user)
+      }.onFailure {
+        session.logout()
       }
     }
+  }
 
-    div(classes = "container-sm") {
-      form {
-        attrs.onSubmitFunction = { handleSubmit(it) }
-        div(classes = "form-group") {
-          label { +"Email" }
-          input(classes = "form-control", type = InputType.text) {
-            attrs.placeholder = "email"
-            attrs.value = email
-            attrs.onChangeFunction = { email = (it.target as HTMLInputElement).value }
+  container {
+    attrs {
+      component = "main"
+      maxWidth = ContainerMaxWidth.xs
+    }
+
+    cssBaseline { }
+    div(classes = classes.paper) {
+      typography {
+        attrs {
+          component = "h1"
+          variant = TypographyVariant.h5
+        }
+
+        +"Sign in"
+      }
+
+      form(classes = classes.form) {
+        attrs {
+          novalidate = true
+          onSubmitFunction = { handleSubmit(it) }
+        }
+
+        textField {
+          attrs {
+            variant = FormControlVariant.outlined
+            margin = FormControlMargin.normal
+            required = true
+            fullWidth = true
+            id = "email"
+            label { +"Email Address" }
+            name = "email"
+            autoComplete = "email"
+            autoFocus = true
+            onChangeFunction = { email = (it.target as HTMLInputElement).value }
           }
         }
-        div(classes = "form-group") {
-          label { +"Password" }
-          input(classes = "form-control", type = InputType.password) {
-            attrs.placeholder = "password"
-            attrs.value = password
-            attrs.onChangeFunction = { password = (it.target as HTMLInputElement).value }
+        textField {
+          attrs {
+            variant = FormControlVariant.outlined
+            margin = FormControlMargin.normal
+            required = true
+            fullWidth = true
+            name = "password"
+            label { +"Password" }
+            type = InputType.password
+            id = "password"
+            autoComplete = "current-password"
+            onChangeFunction = { password = (it.target as HTMLInputElement).value }
           }
         }
-        button(classes = "btn btn-primary", type = ButtonType.submit) {
-          attrs.disabled = !validateForm()
-          +"Login"
+        formControlLabel {
+          attrs {
+            control { checkbox { attrs.value = "remember"; attrs.color = CheckboxColor.primary } }
+            label { +"Remember me" }
+          }
+        }
+        button {
+          attrs {
+            type = ButtonType.submit
+            fullWidth = true
+            variant = ButtonVariant.contained
+            color = ButtonColor.primary
+            className = classes.submit
+            disabled = !validateForm()
+          }
+
+          +"Sign In"
+        }
+        grid {
+          attrs.container = true
+
+          grid {
+            attrs.item = true
+            attrs.xs(true)
+
+            link {
+              attrs.href = "#"
+              attrs.variant = TypographyVariant.body2
+              +"Forgot password?"
+            }
+          }
+          grid {
+            attrs.item = true
+
+            link {
+              attrs.href = "#"
+              attrs.variant = TypographyVariant.body2
+              +"Don't have an account? Sign Up"
+            }
+          }
         }
       }
     }

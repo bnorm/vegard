@@ -1,6 +1,5 @@
 package com.bnorm.vegard
 
-import com.bnorm.vegard.components.App
 import kotlinext.js.require
 import kotlinext.js.requireAll
 import react.dom.render
