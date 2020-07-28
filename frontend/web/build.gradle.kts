@@ -12,7 +12,7 @@ kotlin {
         // TODO: use dsl after KT-32016 will be fixed
         devServer = KotlinWebpackConfig.DevServer(
           port = 8081,
-          proxy = mapOf("/**" to "http://localhost:8080"),
+          proxy = mapOf("/api/v1/**" to "http://localhost:8080"),
           contentBase = listOf("$projectDir/src/main/resources")
         )
         outputFileName = "web.js"

@@ -1,7 +1,7 @@
 package com.bnorm.vegard.auth
 
-import com.bnorm.vegard.client.localJwtStorage
-import com.bnorm.vegard.client.vegardClient
+import com.bnorm.vegard.service.VegardService
+import com.bnorm.vegard.service.useVegardService
 import com.bnorm.vegard.model.User
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -16,9 +16,11 @@ private sealed class UserAction {
   object Logout : UserAction() {
     override fun toString(): String = "Logout"
   }
+
   object Authenticating : UserAction() {
     override fun toString(): String = "Authenticating"
   }
+
   data class Login(val user: User) : UserAction()
 }
 
@@ -27,7 +29,7 @@ private sealed class UserState {
   object Unauthenticated : UserState()
   data class Authenticated(
     val user: User
-  ): UserState()
+  ) : UserState()
 }
 
 interface UserSession {
@@ -40,6 +42,7 @@ interface UserSession {
 }
 
 private class RealUserSession(
+  private val vegardService: VegardService,
   private val state: UserState,
   private val dispatch: RDispatch<UserAction>
 ) : UserSession {
@@ -57,15 +60,20 @@ private class RealUserSession(
   }
 
   override fun logout() {
-    vegardClient.logout()
+    vegardService.logout()
     dispatch(UserAction.Logout)
   }
 }
 
 private val UserContext = createContext<UserSession>()
 
-fun RBuilder.UserSessionProvider(block: RBuilder.(UserSession) -> Unit) {
-  val initState = localJwtStorage.retrieve()?.let { UserState.Unknown } ?: UserState.Unauthenticated
+fun RBuilder.UserSessionProvider(
+  vegardService: VegardService? = null,
+  block: RBuilder.(UserSession) -> Unit
+) {
+  val service = vegardService ?: useVegardService()
+
+  val initState = if (service.authenticated) UserState.Unknown else UserState.Unauthenticated
   val (state, dispatch) = useReducer<UserState, UserAction>({ _, action ->
     when (action) {
       UserAction.Logout -> UserState.Unauthenticated
@@ -78,7 +86,7 @@ fun RBuilder.UserSessionProvider(block: RBuilder.(UserSession) -> Unit) {
     if (state == UserState.Unauthenticated) return@useEffect
     GlobalScope.launch {
       runCatching {
-        val user = vegardClient.getMe()
+        val user = service.getMe()
         dispatch(UserAction.Login(user))
       }.onFailure {
         dispatch(UserAction.Logout)
@@ -86,7 +94,7 @@ fun RBuilder.UserSessionProvider(block: RBuilder.(UserSession) -> Unit) {
     }
   }
 
-  val session = RealUserSession(state, dispatch)
+  val session = RealUserSession(service, state, dispatch)
   UserContext.Provider(session) {
     block(session)
   }

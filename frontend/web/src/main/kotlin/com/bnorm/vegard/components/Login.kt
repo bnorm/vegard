@@ -1,9 +1,9 @@
 package com.bnorm.vegard.components
 
 import com.bnorm.vegard.auth.useUserSession
-import com.bnorm.vegard.client.vegardClient
 import com.bnorm.vegard.model.Password
 import com.bnorm.vegard.model.UserLoginRequest
+import com.bnorm.vegard.service.useVegardService
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.css.Align
@@ -80,6 +80,7 @@ private val LOGIN = rFunction<LoginProps>("Login") {
   val classes = useStyles()
   var email by useState("")
   var password by useState("")
+  val service = useVegardService()
   val session = useUserSession()
 
   fun validateForm() = email.isNotEmpty() && password.isNotEmpty()
@@ -89,8 +90,8 @@ private val LOGIN = rFunction<LoginProps>("Login") {
     GlobalScope.launch {
       session.authenticating()
       runCatching {
-        vegardClient.login(UserLoginRequest(email, Password(password)))
-        val user = vegardClient.getMe()
+        service.login(UserLoginRequest(email, Password(password)))
+        val user = service.getMe()
         session.login(user)
       }.onFailure {
         session.logout()

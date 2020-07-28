@@ -3,21 +3,14 @@ package com.bnorm.vegard.components
 import com.bnorm.vegard.RNode
 import kotlinx.css.Display
 import kotlinx.css.Overflow
-import kotlinx.css.backgroundColor
 import kotlinx.css.display
 import kotlinx.css.flexGrow
 import kotlinx.css.flexShrink
-import kotlinx.css.height
 import kotlinx.css.overflow
-import kotlinx.css.overflowY
 import kotlinx.css.padding
-import kotlinx.css.pct
 import kotlinx.css.px
 import kotlinx.css.width
 import kotlinx.css.zIndex
-import kotlinx.html.ButtonType
-import kotlinx.html.InputType
-import kotlinx.html.js.onSubmitFunction
 import materialui.components.appbar.appBar
 import materialui.components.appbar.enums.AppBarPosition
 import materialui.components.cssbaseline.cssBaseline
@@ -25,24 +18,13 @@ import materialui.components.drawer.drawer
 import materialui.components.drawer.enums.DrawerStyle
 import materialui.components.drawer.enums.DrawerVariant
 import materialui.components.toolbar.toolbar
-import materialui.components.typography.enums.TypographyVariant
-import materialui.components.typography.typography
 import materialui.styles.makeStyles
 import materialui.styles.muitheme.spacing
-import materialui.styles.palette.GreyType
-import materialui.styles.palette.get
 import react.RBuilder
 import react.RProps
-import react.dom.button
 import react.dom.div
-import react.dom.form
-import react.dom.input
-import react.dom.li
 import react.dom.main
-import react.dom.span
-import react.dom.ul
 import react.rFunction
-import react.router.dom.routeLink
 
 @Suppress("FunctionName")
 fun RBuilder.Layout(

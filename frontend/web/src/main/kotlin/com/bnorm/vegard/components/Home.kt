@@ -1,7 +1,7 @@
 package com.bnorm.vegard.components
 
 import com.bnorm.vegard.auth.useUserSession
-import com.bnorm.vegard.client.vegardClient
+import com.bnorm.vegard.service.useVegardService
 import com.bnorm.vegard.model.Controller
 import com.bnorm.vegard.model.ControllerReading
 import kotlinx.coroutines.GlobalScope
@@ -29,14 +29,16 @@ fun RBuilder.Home() = HOME {}
 private interface HomeProps : RProps
 
 private val HOME = rFunction<HomeProps>("Home") {
+  val service = useVegardService()
   val session = useUserSession()
+
   var controllerReadings by useState<Map<Controller, List<ControllerReading>>?>(null)
   useEffect(emptyList()) {
     GlobalScope.launch {
       val now = Date()
       val startTime = Date(now.getTime() - (15L * 24 * 60 * 60 * 1000))
-      controllerReadings = vegardClient.getControllers()
-        .map { async { it to vegardClient.getControllerRecords(it.id, startTime.toISOString()) } }
+      controllerReadings = service.getControllers()
+        .map { async { it to service.getControllerRecords(it.id, startTime.toISOString()) } }
         .map { it.await() }
         .filter { it.second.isNotEmpty() }
         .toMap()
