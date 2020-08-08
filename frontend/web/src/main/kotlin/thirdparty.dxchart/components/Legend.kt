@@ -3,11 +3,12 @@ package thirdparty.dxchart.components
 import react.RBuilder
 import react.RProps
 
-external interface ArgumentAxisProps : RProps
+external interface LegendProps : RProps {
+}
 
-fun RBuilder.ArgumentAxis(
+fun RBuilder.Legend(
   block: RBuilder.() -> Unit = {}
-) = thirdparty.dxchart.ArgumentAxis.invoke {
+) = thirdparty.dxchart.Legend.invoke {
   attrs {
   }
   block()

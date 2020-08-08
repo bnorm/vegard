@@ -35,7 +35,7 @@ private val ROUTES = functionalComponent<RoutesProps> {
     } else if (session.unauthenticated) {
       route(path = "/login") { Login() }
       redirect(from = "/", to = "/login", exact = true)
-      redirect(from = "/home", to = "/login", exact = true)
+      redirect(from = "/home", to = "/login")
     }
   }
 }

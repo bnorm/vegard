@@ -3,6 +3,8 @@ package com.bnorm.vegard.auth
 import com.bnorm.vegard.service.VegardService
 import com.bnorm.vegard.service.useVegardService
 import com.bnorm.vegard.model.User
+import com.bnorm.vegard.useMainScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import react.RBuilder
@@ -36,6 +38,8 @@ interface UserSession {
   val unauthenticated: Boolean
   val user: User?
 
+  val scope: CoroutineScope
+
   fun authenticating()
   fun login(user: User)
   fun logout()
@@ -44,7 +48,8 @@ interface UserSession {
 private class RealUserSession(
   private val vegardService: VegardService,
   private val state: UserState,
-  private val dispatch: RDispatch<UserAction>
+  private val dispatch: RDispatch<UserAction>,
+  override val scope: CoroutineScope
 ) : UserSession {
   override val unauthenticated: Boolean
     get() = state is UserState.Unauthenticated
@@ -72,6 +77,7 @@ fun RBuilder.UserSessionProvider(
   block: RBuilder.(UserSession) -> Unit
 ) {
   val service = vegardService ?: useVegardService()
+  val scope = useMainScope(name = "UserSessionScope")
 
   val initState = if (service.authenticated) UserState.Unknown else UserState.Unauthenticated
   val (state, dispatch) = useReducer<UserState, UserAction>({ _, action ->
@@ -84,7 +90,7 @@ fun RBuilder.UserSessionProvider(
 
   useEffect(emptyList()) {
     if (state == UserState.Unauthenticated) return@useEffect
-    GlobalScope.launch {
+    scope.launch {
       runCatching {
         val user = service.getMe()
         dispatch(UserAction.Login(user))
@@ -94,7 +100,7 @@ fun RBuilder.UserSessionProvider(
     }
   }
 
-  val session = RealUserSession(service, state, dispatch)
+  val session = RealUserSession(service, state, dispatch, scope)
   UserContext.Provider(session) {
     block(session)
   }

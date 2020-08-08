@@ -7,8 +7,8 @@ external interface ChartProps : RProps {
   var data: Array<*>
 }
 
-fun RBuilder.Chart(
-  data: Array<*>,
+fun <T> RBuilder.Chart(
+  data: Array<T>,
   block: RBuilder.() -> Unit = {}
 ) = thirdparty.dxchart.Chart.invoke {
   attrs {

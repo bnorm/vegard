@@ -1,11 +1,13 @@
 package com.bnorm.vegard.service
 
 import com.bnorm.vegard.client.VegardClient
+import com.bnorm.vegard.getValue
 import com.bnorm.vegard.model.Controller
 import com.bnorm.vegard.model.ControllerId
 import com.bnorm.vegard.model.ControllerReading
 import com.bnorm.vegard.model.User
 import com.bnorm.vegard.model.UserLoginRequest
+import com.bnorm.vegard.setValue
 import io.ktor.client.HttpClient
 import io.ktor.client.features.defaultRequest
 import io.ktor.http.HttpHeaders
@@ -24,28 +26,31 @@ val vegardApiUrl = URLBuilder(window.location.toString()).apply {
   trailingQuery = false
 }.build()
 
-
 class RestVegardService(
   url: Url = vegardApiUrl
 ) : VegardService {
-  private var jwt: String? = null
+  private var vegardJwt: String? by window.localStorage
 
   private val client = VegardClient(
     url = url,
     client = HttpClient {
       defaultRequest {
-        jwt?.let { headers[HttpHeaders.Authorization] = "Bearer $it" }
+        vegardJwt?.let { headers[HttpHeaders.Authorization] = "Bearer $it" }
       }
     }
   )
 
   override val authenticated: Boolean
-    get() = jwt != null // TODO check expired
+    get() = vegardJwt != null // TODO check expired
 
-  override suspend fun login(request: UserLoginRequest): String = client.login(request)
+  override suspend fun login(request: UserLoginRequest): String {
+    val jwt = client.login(request)
+    this.vegardJwt = jwt
+    return jwt
+  }
 
   override fun logout() {
-    jwt = null
+    vegardJwt = null
   }
 
   override suspend fun getMe(): User = client.getMe()

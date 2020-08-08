@@ -97,9 +97,11 @@ configure<com.bnorm.power.PowerAssertGradleExtension> {
   functions = listOf("com.bnorm.vegard.assertTrue")
 }
 
-tasks.processResources.configure {
-  from(tasks.getByPath(":frontend:web:jsBundle")) {
-    into("web-ui")
+if ("bundleUi" in properties) {
+  tasks.processResources.configure {
+    from(tasks.getByPath(":frontend:web:jsBundle")) {
+      into("web-ui")
+    }
   }
 }
 

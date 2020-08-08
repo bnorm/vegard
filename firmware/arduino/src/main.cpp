@@ -16,11 +16,11 @@ char pass[] = SECRET_PASS; // your network password (use for WPA, or use as key 
 
 char host[] = SERVER_HOST;
 char macAddress[18];
-int port = 8081;
+int port = 8080;
 
 WiFiClient wifi;
 HttpClient client = HttpClient(wifi, host, port);
-String token;
+String token = "";
 
 dht tempSensor;
 
@@ -103,6 +103,7 @@ void setup() {
 }
 
 void loop() {
+    Serial.println("LOOP");
     if (DHTLIB_OK != tempSensor.read2302(DHT22_PIN)) {
         delay(DELAY);
         return;
@@ -114,7 +115,7 @@ void loop() {
     int statusCode;
 
     statusCode = record(client, token, moisture1Raw, tempSensor.temperature, tempSensor.humidity);
-    while (statusCode == 401) {
+    while (statusCode != 200) {
         connect(token);
         statusCode = record(client, token, moisture1Raw, tempSensor.temperature, tempSensor.humidity);
     }

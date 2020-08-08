@@ -87,7 +87,7 @@ private val LOGIN = rFunction<LoginProps>("Login") {
   fun handleSubmit(event: Event) {
     event.preventDefault()
 
-    GlobalScope.launch {
+    session.scope.launch {
       session.authenticating()
       runCatching {
         service.login(UserLoginRequest(email, Password(password)))
