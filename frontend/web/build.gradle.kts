@@ -39,7 +39,7 @@ dependencies {
   implementation("org.jetbrains:kotlin-react-dom:16.13.1-pre.110-kotlin-1.3.72")
   implementation("org.jetbrains:kotlin-react-router-dom:5.1.2-pre.110-kotlin-1.3.72")
 
-  implementation("subroh0508.net.kotlinmaterialui:core:0.4.4")
+  implementation("subroh0508.net.kotlinmaterialui:core:0.4.5")
 
   implementation("io.github.microutils:kotlin-logging-js:1.8.3")
 
