@@ -1,12 +1,14 @@
 package com.bnorm.vegard
 
-import com.auth0.jwt.interfaces.Payload
 import com.bnorm.vegard.api.ById
 import com.bnorm.vegard.api.RecordsById
 import com.bnorm.vegard.auth.ControllerPrincipal
 import com.bnorm.vegard.auth.JwtService
 import com.bnorm.vegard.auth.LoginFailureException
 import com.bnorm.vegard.auth.UserPrincipal
+import com.bnorm.vegard.auth.controllerId
+import com.bnorm.vegard.auth.refresh
+import com.bnorm.vegard.auth.userId
 import com.bnorm.vegard.model.ControllerActionWrapper
 import com.bnorm.vegard.model.ControllerConnectRequest
 import com.bnorm.vegard.model.ControllerId
@@ -159,8 +161,18 @@ fun Application.app(
         val credentials = call.receive<UserLoginRequest>()
         val user = userService.findUserByCredentials(credentials)
           ?: throw LoginFailureException("unknown user credentials")
-        val token = jwtService.createToken(user.id)
+        val token = jwtService.createToken(user.id, 14)
         call.respondText(token)
+      }
+
+      authenticate("user_jwt") {
+        post("refresh") {
+          val principal = call.principal<UserPrincipal>()!!
+          val remaining = principal.jwt.refresh
+          if (remaining <= 0) throw LoginFailureException("unable to refresh credentials")
+          val token = jwtService.createToken(principal.user.id, remaining - 1)
+          call.respondText(token)
+        }
       }
 
       post("connect") {
@@ -231,13 +243,3 @@ fun Application.app(
     }
   }
 }
-
-private val Payload.userId
-  get() = subject.takeIf { getClaim("role").asString() == "user" }
-    ?.toLongOrNull()
-    ?.let { UserId(it) }
-
-private val Payload.controllerId
-  get() = subject.takeIf { getClaim("role").asString() == "controller" }
-    ?.toLongOrNull()
-    ?.let { ControllerId(it) }

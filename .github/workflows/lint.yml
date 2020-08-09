@@ -1,17 +1,13 @@
-name: ktlint
+name: lint
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   ktlint:
-    name: Check Code Quality
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clone repo
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
+      - uses: actions/checkout@v2
 
       - name: ktlint
         uses: ScaCap/action-ktlint@1.1
