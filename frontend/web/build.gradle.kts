@@ -34,10 +34,10 @@ dependencies {
 
   implementation("io.ktor:ktor-client-auth-js:1.3.2")
 
-  implementation("org.jetbrains:kotlin-extensions:1.0.1-pre.110-kotlin-1.3.72")
-  implementation("org.jetbrains:kotlin-react:16.13.1-pre.110-kotlin-1.3.72")
-  implementation("org.jetbrains:kotlin-react-dom:16.13.1-pre.110-kotlin-1.3.72")
-  implementation("org.jetbrains:kotlin-react-router-dom:5.1.2-pre.110-kotlin-1.3.72")
+  implementation("org.jetbrains:kotlin-extensions:1.0.1-pre.111-kotlin-1.4.0")
+  implementation("org.jetbrains:kotlin-react:16.13.1-pre.111-kotlin-1.4.0")
+  implementation("org.jetbrains:kotlin-react-dom:16.13.1-pre.111-kotlin-1.4.0")
+  implementation("org.jetbrains:kotlin-react-router-dom:5.1.2-pre.111-kotlin-1.4.0")
 
   implementation("subroh0508.net.kotlinmaterialui:core:0.4.5")
 
