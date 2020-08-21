@@ -15,18 +15,7 @@ kotlin {
   sourceSets {
     named("commonMain") {
       dependencies {
-        implementation(kotlin("stdlib"))
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:0.20.0")
-      }
-    }
-    named("jvmMain") {
-      dependencies {
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
-      }
-    }
-    named("jsMain") {
-      dependencies {
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime-js:0.20.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
       }
     }
   }

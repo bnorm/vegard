@@ -61,7 +61,7 @@ class UserResponse(
   fun success(): User {
     with(call) {
       assertEquals(HttpStatusCode.OK, response.status())
-      return Json.parse(User.serializer(), response.content!!)
+      return Json.decodeFromString(User.serializer(), response.content!!)
     }
   }
 

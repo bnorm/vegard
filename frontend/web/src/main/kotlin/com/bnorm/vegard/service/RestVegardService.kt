@@ -13,7 +13,7 @@ import io.ktor.client.features.defaultRequest
 import io.ktor.http.HttpHeaders
 import io.ktor.http.URLBuilder
 import io.ktor.http.Url
-import kotlin.browser.window
+import kotlinx.browser.window
 
 val vegardApiUrl = URLBuilder(window.location.toString()).apply {
   path("api", "v1")

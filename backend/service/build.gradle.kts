@@ -27,16 +27,16 @@ dependencies {
 
   implementation(project(":common:model"))
 
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.3.8")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.3.9")
 
   implementation("com.google.inject:guice:4.2.3:no_aop")
 
-  implementation("io.ktor:ktor-server-netty:1.3.2")
-  implementation("io.ktor:ktor-locations:1.3.2")
-  implementation("io.ktor:ktor-websockets:1.3.2")
-  implementation("io.ktor:ktor-serialization:1.3.2")
-  implementation("io.ktor:ktor-auth:1.3.2")
-  implementation("io.ktor:ktor-auth-jwt:1.3.2")
+  implementation("io.ktor:ktor-server-netty:1.4.0")
+  implementation("io.ktor:ktor-locations:1.4.0")
+  implementation("io.ktor:ktor-websockets:1.4.0")
+  implementation("io.ktor:ktor-serialization:1.4.0")
+  implementation("io.ktor:ktor-auth:1.4.0")
+  implementation("io.ktor:ktor-auth-jwt:1.4.0")
 
   implementation("at.favre.lib:bcrypt:0.9.0")
 
@@ -57,7 +57,7 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.2")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
 
-  testImplementation("io.ktor:ktor-server-test-host:1.3.2")
+  testImplementation("io.ktor:ktor-server-test-host:1.4.0")
 
   // Integration tests
   integrationImplementation("org.testcontainers:testcontainers:1.14.3")
@@ -69,9 +69,7 @@ tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
     jvmTarget = "11"
     freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
-//    if ("test" in name.toLowerCase() || "integration" in name.toLowerCase()) {
-//      useIR = true
-//    }
+//    useIR = true
   }
 }
 
@@ -94,7 +92,10 @@ val integrationTest = task<Test>("integrationTest") {
 tasks.check { dependsOn(integrationTest) }
 
 configure<com.bnorm.power.PowerAssertGradleExtension> {
-  functions = listOf("com.bnorm.vegard.assertTrue")
+  functions = listOf(
+    "com.bnorm.vegard.assertTrue",
+    "org.junit.jupiter.api.Assertions.assertEquals"
+  )
 }
 
 if ("bundleUi" in properties) {

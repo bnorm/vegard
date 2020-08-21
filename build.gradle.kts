@@ -1,9 +1,9 @@
 plugins {
-  kotlin("jvm") version "1.3.72" apply false
-  kotlin("js") version "1.3.72" apply false
-  kotlin("multiplatform") version "1.3.72" apply false
-  kotlin("plugin.serialization") version "1.3.72" apply false
-  kotlin("plugin.jpa") version "1.3.72" apply false
+  kotlin("jvm") version "1.4.0" apply false
+  kotlin("js") version "1.4.0" apply false
+  kotlin("multiplatform") version "1.4.0" apply false
+  kotlin("plugin.serialization") version "1.4.0" apply false
+  kotlin("plugin.jpa") version "1.4.0" apply false
   id("com.bnorm.power.kotlin-power-assert") version "0.3.1"
 
   idea

@@ -1,13 +1,13 @@
 package com.bnorm.vegard.model
 
-import kotlinx.serialization.Decoder
-import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.PrimitiveDescriptor
-import kotlinx.serialization.PrimitiveKind
-import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 @RequiresOptIn
 annotation class PasswordUsage
@@ -21,7 +21,7 @@ class Password(
 ) {
   @Serializer(forClass = Password::class)
   companion object : KSerializer<Password> {
-    override val descriptor: SerialDescriptor = PrimitiveDescriptor("Password", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Password", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Password) {
       @OptIn(PasswordUsage::class)

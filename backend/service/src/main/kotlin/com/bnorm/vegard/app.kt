@@ -51,7 +51,7 @@ import io.ktor.serialization.json
 import io.ktor.util.DataConversionException
 import kotlinx.coroutines.flow.toList
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.time.Instant
@@ -88,11 +88,11 @@ fun Application.app(
   }
   install(ContentNegotiation) {
     json(
-      json = JsonConfiguration.Stable.copy(
-        isLenient = true,
-        serializeSpecialFloatingPointValues = true,
+      json = Json {
+        isLenient = true
+        allowSpecialFloatingPointValues = true
         allowStructuredMapKeys = true
-      )
+      }
     )
   }
 
