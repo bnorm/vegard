@@ -1,10 +1,12 @@
 package com.bnorm.vegard.components
 
+import com.bnorm.react.RFunction
+import com.bnorm.vegard.auth.UserSession
 import com.bnorm.vegard.auth.useUserSession
 import com.bnorm.vegard.model.Password
 import com.bnorm.vegard.model.UserLoginRequest
+import com.bnorm.vegard.service.VegardService
 import com.bnorm.vegard.service.useVegardService
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.css.Align
 import kotlinx.css.Display
@@ -19,6 +21,7 @@ import kotlinx.css.pct
 import kotlinx.css.width
 import kotlinx.html.ButtonType
 import kotlinx.html.InputType
+import kotlinx.html.id
 import kotlinx.html.js.onChangeFunction
 import kotlinx.html.js.onSubmitFunction
 import materialui.components.button.button
@@ -43,18 +46,11 @@ import materialui.styles.palette.main
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import react.RBuilder
-import react.RProps
 import react.dom.div
 import react.dom.form
 import react.getValue
-import react.rFunction
 import react.setValue
 import react.useState
-
-@Suppress("FunctionName")
-fun RBuilder.Login() = LOGIN {}
-
-private interface LoginProps : RProps
 
 private val useStyles = makeStyles<dynamic> {
   "paper" {
@@ -76,12 +72,17 @@ private val useStyles = makeStyles<dynamic> {
   }
 }
 
-private val LOGIN = rFunction<LoginProps>("Login") {
+@Suppress("FunctionName")
+@RFunction
+fun RBuilder.Login(
+  service: VegardService? = null,
+  session: UserSession? = null
+) {
   val classes = useStyles()
   var email by useState("")
   var password by useState("")
-  val service = useVegardService()
-  val session = useUserSession()
+  val service = service ?: useVegardService()
+  val session = session ?: useUserSession()
 
   fun validateForm() = email.isNotEmpty() && password.isNotEmpty()
   fun handleSubmit(event: Event) {
@@ -118,6 +119,7 @@ private val LOGIN = rFunction<LoginProps>("Login") {
 
       form(classes = classes.form) {
         attrs {
+          id = "loginForm"
           novalidate = true
           onSubmitFunction = { handleSubmit(it) }
         }
@@ -128,12 +130,13 @@ private val LOGIN = rFunction<LoginProps>("Login") {
             margin = FormControlMargin.normal
             required = true
             fullWidth = true
-            id = "email"
+            id = "emailInput"
             label { +"Email Address" }
             name = "email"
             autoComplete = "email"
             autoFocus = true
-            onChangeFunction = { email = (it.target as HTMLInputElement).value }
+            value = email
+            onChangeFunction = { email = it.target.unsafeCast<HTMLInputElement>().value }
           }
         }
         textField {
@@ -145,9 +148,10 @@ private val LOGIN = rFunction<LoginProps>("Login") {
             name = "password"
             label { +"Password" }
             type = InputType.password
-            id = "password"
+            id = "passwordInput"
             autoComplete = "current-password"
-            onChangeFunction = { password = (it.target as HTMLInputElement).value }
+            value = password
+            onChangeFunction = { password = it.target.unsafeCast<HTMLInputElement>().value }
           }
         }
         formControlLabel {
@@ -158,6 +162,7 @@ private val LOGIN = rFunction<LoginProps>("Login") {
         }
         button {
           attrs {
+            id = "loginButton"
             type = ButtonType.submit
             fullWidth = true
             variant = ButtonVariant.contained

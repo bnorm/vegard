@@ -33,6 +33,12 @@ class VegardClient(
     }
   }
 
+  suspend fun refresh(): String {
+    return client.post(url.appendPath("refresh")) {
+      header(HttpHeaders.ContentType, ContentType.Application.Json)
+    }
+  }
+
   suspend fun getMe(): User {
     return client.get(url.appendPath("users", "me"))
   }

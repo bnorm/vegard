@@ -6,7 +6,7 @@ import react.useContext
 
 fun useVegardService(): VegardService = useContext(VegardServiceContext)
 
-private val VegardServiceContext = createContext<VegardService>()
+val VegardServiceContext = createContext<VegardService>()
 
 fun RBuilder.VegardServiceProvider(
   service: VegardService,

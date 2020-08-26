@@ -69,7 +69,7 @@ tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
     jvmTarget = "11"
     freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
-    useIR = true
+//    useIR = true
   }
 }
 

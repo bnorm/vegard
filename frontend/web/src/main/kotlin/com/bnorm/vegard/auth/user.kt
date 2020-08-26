@@ -5,7 +5,7 @@ import com.bnorm.vegard.service.useVegardService
 import com.bnorm.vegard.model.User
 import com.bnorm.vegard.useMainScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import react.RBuilder
 import react.RDispatch
@@ -70,7 +70,7 @@ private class RealUserSession(
   }
 }
 
-private val UserContext = createContext<UserSession>()
+val UserSessionContext = createContext<UserSession>()
 
 fun RBuilder.UserSessionProvider(
   vegardService: VegardService? = null,
@@ -100,10 +100,19 @@ fun RBuilder.UserSessionProvider(
     }
   }
 
+  useEffect(emptyList()) {
+    scope.launch {
+      while (true) {
+        runCatching { service.refresh() }
+        delay(1 * 24 * 60 * 60 * 1000)
+      }
+    }
+  }
+
   val session = RealUserSession(service, state, dispatch, scope)
-  UserContext.Provider(session) {
+  UserSessionContext.Provider(session) {
     block(session)
   }
 }
 
-fun useUserSession(): UserSession = useContext(UserContext)
+fun useUserSession(): UserSession = useContext(UserSessionContext)

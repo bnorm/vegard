@@ -10,6 +10,7 @@ interface VegardService {
   val authenticated: Boolean
 
   suspend fun login(request: UserLoginRequest): String
+  suspend fun refresh(): String
   fun logout()
   suspend fun getMe(): User
   suspend fun getControllers(): List<Controller>

@@ -7,9 +7,8 @@ plugins {
 
 kotlin {
   jvm()
-  js {
+  js(IR) {
     browser()
-    nodejs()
   }
 
   sourceSets {
@@ -25,8 +24,6 @@ tasks.withType<KotlinCompile>().configureEach {
   kotlinOptions {
     jvmTarget = "11"
     freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
-//    if ("test" in name.toLowerCase() || "integration" in name.toLowerCase()) {
-//      useIR = true
-//    }
+//    useIR = true
   }
 }

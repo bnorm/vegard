@@ -5,39 +5,22 @@ plugins {
 
 kotlin {
   jvm()
-  js {
+  js(IR) {
     browser()
-    nodejs()
   }
 
   sourceSets {
     named("commonMain") {
       dependencies {
-        implementation(kotlin("stdlib"))
-
         api(project(":common:model"))
         api("io.ktor:ktor-client-core:1.4.0")
-
         implementation("io.ktor:ktor-client-json:1.4.0")
         implementation("io.ktor:ktor-client-serialization:1.4.0")
       }
     }
     named("jvmMain") {
       dependencies {
-        implementation(kotlin("stdlib-jdk8"))
-
         implementation("io.ktor:ktor-client-okhttp:1.4.0")
-      }
-    }
-    named("jsMain") {
-      dependencies {
-        implementation(kotlin("stdlib-js"))
-
-        implementation(npm("text-encoding", "0.7.0"))
-        implementation(npm("abort-controller", "3.0.0"))
-        implementation(npm("utf-8-validate", "5.0.2"))
-        implementation(npm("bufferutil", "4.0.1"))
-        implementation(npm("fs", "0.0.2"))
       }
     }
   }

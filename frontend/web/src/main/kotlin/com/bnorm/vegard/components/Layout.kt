@@ -1,5 +1,6 @@
 package com.bnorm.vegard.components
 
+import com.bnorm.react.RFunction
 import com.bnorm.vegard.RNode
 import kotlinx.css.Display
 import kotlinx.css.Overflow
@@ -21,29 +22,8 @@ import materialui.components.toolbar.toolbar
 import materialui.styles.makeStyles
 import materialui.styles.muitheme.spacing
 import react.RBuilder
-import react.RProps
 import react.dom.div
 import react.dom.main
-import react.rFunction
-
-@Suppress("FunctionName")
-fun RBuilder.Layout(
-  toolbar: RNode,
-  sidebar: RNode,
-  details: RNode? = null,
-  block: RBuilder.() -> Unit = {}
-) = LAYOUT {
-  attrs.toolbar = toolbar
-  attrs.sidebar = sidebar
-  attrs.details = details
-  block()
-}
-
-private interface LayoutProps : RProps {
-  var toolbar: RNode
-  var sidebar: RNode
-  var details: RNode?
-}
 
 private val drawerWidth = 240.px
 private val useStyles = makeStyles<dynamic> {
@@ -69,7 +49,14 @@ private val useStyles = makeStyles<dynamic> {
   }
 }
 
-private val LAYOUT = rFunction<LayoutProps>("Layout") { props ->
+@Suppress("FunctionName")
+@RFunction
+fun RBuilder.Layout(
+  toolbar: RNode,
+  sidebar: RNode,
+  details: RNode? = null,
+  block: RBuilder.() -> Unit = {}
+) {
   val classes = useStyles()
 
   div(classes = classes.root) {
@@ -81,7 +68,7 @@ private val LAYOUT = rFunction<LayoutProps>("Layout") { props ->
         position = AppBarPosition.fixed
       }
       toolbar {
-        props.toolbar(this)
+        toolbar(this)
       }
     }
 
@@ -93,18 +80,16 @@ private val LAYOUT = rFunction<LayoutProps>("Layout") { props ->
       }
       toolbar {}
       div(classes = classes.drawerContainer) {
-        props.sidebar(this)
+        sidebar(this)
       }
     }
 
     main(classes = classes.content) {
       toolbar {}
 
-      props.children()
+      block()
     }
-
-    // TODO props.details?.let { div(classes = classes.sidebar) { it(this) } }
   }
+
+  // TODO details?.let { div(classes = classes.sidebar) { it(this) } }
 }
-
-

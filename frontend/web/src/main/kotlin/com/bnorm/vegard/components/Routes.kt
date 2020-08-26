@@ -1,41 +1,39 @@
 package com.bnorm.vegard.components
 
+import com.bnorm.react.RFunction
 import com.bnorm.vegard.auth.useUserSession
 import materialui.components.typography.enums.TypographyVariant
 import materialui.components.typography.typography
+import react.Fragment
 import react.RBuilder
-import react.RProps
-import react.child
 import react.dom.div
-import react.functionalComponent
 import react.router.dom.browserRouter
 import react.router.dom.redirect
 import react.router.dom.route
 
 @Suppress("FunctionName")
-fun RBuilder.Routes() = child(ROUTES) {}
-
-private interface RoutesProps : RProps
-
-private val ROUTES = functionalComponent<RoutesProps> {
+@RFunction
+fun RBuilder.Routes() {
   val session = useUserSession()
   browserRouter {
     if (session.user != null) {
       route(path = "/home") {
-        Layout(
-          toolbar = { toolbar() },
-          sidebar = { sidebar() },
-          details = { +"Details" }
-        ) {
-          Home()
+        Fragment {
+          Layout(
+            toolbar = { toolbar() },
+            sidebar = { sidebar() },
+            details = { +"Details" }
+          ) {
+            Home()
+          }
         }
       }
       redirect(from = "/", to = "/home", exact = true)
       redirect(from = "/login", to = "/home", exact = true)
     } else if (session.unauthenticated) {
-      route(path = "/login") { Login() }
+      route(path = "/login") { Fragment { Login() } }
       redirect(from = "/", to = "/login", exact = true)
-      redirect(from = "/home", to = "/login")
+      redirect(from = "/home", to = "/login", exact = true)
     }
   }
 }
