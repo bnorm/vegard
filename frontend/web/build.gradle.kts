@@ -37,7 +37,7 @@ dependencies {
   implementation("org.jetbrains:kotlin-react-dom:16.13.1-pre.112-kotlin-1.4.0")
   implementation("org.jetbrains:kotlin-react-router-dom:5.1.2-pre.112-kotlin-1.4.0")
 
-  implementation("subroh0508.net.kotlinmaterialui:core:0.5.0-beta1")
+  implementation("subroh0508.net.kotlinmaterialui:core:0.5.0-beta2")
 
   implementation(npm("@devexpress/dx-react-core", "2.7.0"))
   implementation(npm("@devexpress/dx-react-chart", "2.7.0"))
