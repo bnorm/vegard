@@ -31,7 +31,7 @@ dependencies {
 
   implementation("io.ktor:ktor-client-auth-js:1.4.0")
 
-  implementation("com.bnorm.react:kotlin-react-function:0.1.0")
+  implementation("com.bnorm.react:kotlin-react-function:0.2.0")
   implementation("org.jetbrains:kotlin-extensions:1.0.1-pre.113-kotlin-1.4.0")
   implementation("org.jetbrains:kotlin-react:16.13.1-pre.113-kotlin-1.4.0")
   implementation("org.jetbrains:kotlin-react-dom:16.13.1-pre.113-kotlin-1.4.0")
