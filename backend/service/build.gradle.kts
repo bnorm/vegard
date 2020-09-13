@@ -53,9 +53,9 @@ dependencies {
   runtimeOnly("org.apache.logging.log4j:log4j-core:2.13.3")
 
   // Unit tests
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
-  testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.2")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+  testImplementation("org.junit.jupiter:junit-jupiter-params:5.7.0")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
 
   testImplementation("io.ktor:ktor-server-test-host:1.4.0")
 
