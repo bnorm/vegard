@@ -31,12 +31,12 @@ dependencies {
 
   implementation("com.google.inject:guice:4.2.3:no_aop")
 
-  implementation("io.ktor:ktor-server-netty:1.4.0")
-  implementation("io.ktor:ktor-locations:1.4.0")
-  implementation("io.ktor:ktor-websockets:1.4.0")
-  implementation("io.ktor:ktor-serialization:1.4.0")
-  implementation("io.ktor:ktor-auth:1.4.0")
-  implementation("io.ktor:ktor-auth-jwt:1.4.0")
+  implementation("io.ktor:ktor-server-netty:1.4.1")
+  implementation("io.ktor:ktor-locations:1.4.1")
+  implementation("io.ktor:ktor-websockets:1.4.1")
+  implementation("io.ktor:ktor-serialization:1.4.1")
+  implementation("io.ktor:ktor-auth:1.4.1")
+  implementation("io.ktor:ktor-auth-jwt:1.4.1")
 
   implementation("at.favre.lib:bcrypt:0.9.0")
 
@@ -57,7 +57,7 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter-params:5.7.0")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
 
-  testImplementation("io.ktor:ktor-server-test-host:1.4.0")
+  testImplementation("io.ktor:ktor-server-test-host:1.4.1")
 
   // Integration tests
   integrationImplementation("org.testcontainers:testcontainers:1.14.3")
