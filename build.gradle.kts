@@ -4,7 +4,7 @@ plugins {
   kotlin("multiplatform") version "1.4.0" apply false
   kotlin("plugin.serialization") version "1.4.0" apply false
   kotlin("plugin.jpa") version "1.4.0" apply false
-  id("com.bnorm.power.kotlin-power-assert") version "0.5.1" apply false
+  id("com.bnorm.power.kotlin-power-assert") version "0.5.2" apply false
   id("com.bnorm.react.kotlin-react-function") version "0.2.0" apply false
 
   idea
