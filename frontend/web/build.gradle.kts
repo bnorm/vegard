@@ -35,7 +35,7 @@ dependencies {
   implementation("org.jetbrains:kotlin-extensions:1.0.1-pre.125-kotlin-1.4.10")
   implementation("org.jetbrains:kotlin-react:16.14.0-pre.125-kotlin-1.4.10")
   implementation("org.jetbrains:kotlin-react-dom:16.14.0-pre.125-kotlin-1.4.10")
-  implementation("org.jetbrains:kotlin-react-router-dom:5.1.2-pre.125-kotlin-1.4.10")
+  implementation("org.jetbrains:kotlin-react-router-dom:5.2.0-pre.126-kotlin-1.4.10")
 
   implementation("subroh0508.net.kotlinmaterialui:core:0.5.0-beta3")
 
