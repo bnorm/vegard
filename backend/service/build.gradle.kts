@@ -27,7 +27,7 @@ dependencies {
 
   implementation(project(":common:model"))
 
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.4.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.4.1")
 
   implementation("com.google.inject:guice:4.2.3:no_aop")
 

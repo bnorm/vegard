@@ -27,7 +27,7 @@ dependencies {
   implementation(project(":common:model"))
   implementation(project(":common:client"))
 
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.4.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.4.1")
 
   implementation("io.ktor:ktor-client-auth-js:1.4.1")
 
