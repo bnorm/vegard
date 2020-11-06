@@ -60,9 +60,9 @@ dependencies {
   testImplementation("io.ktor:ktor-server-test-host:1.4.1")
 
   // Integration tests
-  integrationImplementation("org.testcontainers:testcontainers:1.14.3")
-  integrationImplementation("org.testcontainers:junit-jupiter:1.14.3")
-  integrationImplementation("org.testcontainers:postgresql:1.14.3")
+  integrationImplementation("org.testcontainers:testcontainers:1.15.0")
+  integrationImplementation("org.testcontainers:junit-jupiter:1.15.0")
+  integrationImplementation("org.testcontainers:postgresql:1.15.0")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
