@@ -29,7 +29,7 @@ dependencies {
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.4.1")
 
-  implementation("io.ktor:ktor-client-auth-js:1.4.1")
+  implementation("io.ktor:ktor-client-auth-js:1.4.2")
 
   implementation("com.bnorm.react:kotlin-react-function:0.2.1")
   implementation("org.jetbrains:kotlin-extensions:1.0.1-pre.126-kotlin-1.4.10")
