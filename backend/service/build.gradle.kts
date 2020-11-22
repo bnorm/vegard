@@ -46,7 +46,7 @@ dependencies {
   implementation("org.flywaydb:flyway-core:7.2.1")
   runtimeOnly("org.postgresql:postgresql:42.2.18")
 
-  implementation("tech.units:indriya:2.1")
+  implementation("tech.units:indriya:2.1.1")
 
   implementation("org.apache.logging.log4j:log4j-api:2.14.0")
   runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.14.0")
