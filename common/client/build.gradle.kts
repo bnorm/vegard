@@ -20,7 +20,7 @@ kotlin {
     }
     named("jvmMain") {
       dependencies {
-        implementation("io.ktor:ktor-client-okhttp:1.4.3")
+        implementation("io.ktor:ktor-client-okhttp:1.5.0")
       }
     }
   }
