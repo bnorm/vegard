@@ -43,7 +43,7 @@ dependencies {
   implementation("org.jetbrains.exposed:exposed-dao:0.28.1")
   implementation("org.jetbrains.exposed:exposed-java-time:0.28.1")
   runtimeOnly("org.jetbrains.exposed:exposed-jdbc:0.28.1")
-  implementation("org.flywaydb:flyway-core:7.3.2")
+  implementation("org.flywaydb:flyway-core:7.5.2")
   runtimeOnly("org.postgresql:postgresql:42.2.18")
 
   implementation("tech.units:indriya:2.1.1")
